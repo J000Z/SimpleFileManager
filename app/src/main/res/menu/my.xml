@@ -1,0 +1,20 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MyActivity" >
+    <item android:id="@+id/up"
+        android:icon="@drawable/ic_action_up"
+        android:title="upper level"
+        android:showAsAction="always"/>
+    <item android:id="@+id/new_folder"
+        android:title="New folder"
+        android:showAsAction="never"/>
+    <item android:id="@+id/new_file"
+        android:title="New file"
+        android:showAsAction="never"/>
+    <item android:id="@+id/action_settings"
+        android:icon="@drawable/ic_action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never" />
+</menu>

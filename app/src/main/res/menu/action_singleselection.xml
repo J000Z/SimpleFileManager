@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/context_bar"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MyActivity">
+    <item android:id="@+id/select"
+        android:icon="@drawable/ic_action_accept"
+        android:title="select"
+        app:showAsAction="always"/>
+    <item android:id="@+id/up"
+        android:icon="@drawable/ic_action_up"
+        android:title="upper level"
+        app:showAsAction="always"/>
+</menu>

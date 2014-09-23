@@ -1,0 +1,11 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:actionModeCloseDrawable">@drawable/ic_action_back</item>
+
+        <!-- Support library compatibility -->
+        <item name="actionModeCloseDrawable">@drawable/ic_action_back</item>
+    </style>
+
+</resources>
