@@ -31,6 +31,9 @@ public class AppPreferenceManager {
     }
 
     public void addType(String file_type) {
+        if (file_type.length() == 0 || !file_type.startsWith(".")){
+            return;
+        }
         if (file_type.contains(" ")) {
             return;
         }

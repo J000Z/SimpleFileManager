@@ -38,4 +38,5 @@ public class type_view extends LinearLayout {
     }
 
 
+
 }

@@ -28,7 +28,7 @@
             android:label="Selection" >
         </activity>
         <activity
-            android:name="com.hq.simplefilemanager.typeListActivity"
+            android:name=".typeListActivity"
             android:label="Preferred_app_setting" >
         </activity>
         <activity

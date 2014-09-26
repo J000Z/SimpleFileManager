@@ -6,10 +6,12 @@ import android.app.DialogFragment;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -73,25 +75,20 @@ public class typeListActivity extends Activity
                 return;
             }
             System.out.println("Preference: add type " + input);
-            p_manager.addType(input);
-            refresh();
+            if (input.startsWith(".") && input.length()!=0 && !input.contains("\\s+")) {
+                p_manager.addType(input);
+                refresh();
+            }
         }
 
     }
 
     public void refresh(){
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.main_LinearLayout);
+
         mainLayout.removeAllViews();
         String[] default_cat = {"Video", "Audio", "Text"};
         addTypeViews(mainLayout,default_cat);
-
-        //add horizontal line
-        //View horizontal_line = new View(getApplicationContext());
-
-        //horizontal_line.setBackgroundColor(getResources().getColor(R.color.black));
-
-
-
 
         View horizontal_line = getLayoutInflater().inflate(R.layout.horizontal_line, null);
         mainLayout.addView(horizontal_line);
@@ -110,8 +107,8 @@ public class typeListActivity extends Activity
                 @Override
                 public void onClick(View view) {
                     System.out.println("Open preference for " + view.getTag());
-                    Intent intent = new Intent(typeListActivity.this,typeActivity.class);
-                    intent.putExtra("file_type",(String)view.getTag());
+                    Intent intent = new Intent(typeListActivity.this, typeActivity.class);
+                    intent.putExtra("file_type", (String) view.getTag());
                     //startActivity(intent);
                     startActivityForResult(intent, 1);//1 for copy
                 }

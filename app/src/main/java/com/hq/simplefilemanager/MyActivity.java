@@ -5,12 +5,15 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.print.PrintAttributes;
 import android.support.v4.app.FragmentActivity;
 import android.view.ActionMode;
 import android.view.KeyEvent;
@@ -157,7 +160,7 @@ public class MyActivity extends FragmentActivity
                 } else {
                     Uri uri = Uri.fromFile(currentFiles[position]);
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(uri, getMimeType(currentFiles[position]));
+                    intent.setDataAndType(uri, typeManager.getMimeType(currentFiles[position]));
                     startActivity(intent);
                 }
             }
@@ -382,48 +385,6 @@ public class MyActivity extends FragmentActivity
 
     }
 
-    public String getMimeType(File url){
-        if (url.toString().contains(".doc") || url.toString().contains(".docx")) {
-            // Word document
-            return "application/msword";
-        } else if(url.toString().contains(".pdf")) {
-            // PDF file
-            return "application/pdf";
-        } else if(url.toString().contains(".ppt") || url.toString().contains(".pptx")) {
-            // Powerpoint file
-            return "application/vnd.ms-powerpoint";
-        } else if(url.toString().contains(".xls") || url.toString().contains(".xlsx")) {
-            // Excel file
-            return "application/vnd.ms-excel";
-        } else if(url.toString().contains(".zip") || url.toString().contains(".rar")) {
-            // WAV audio file
-            return "application/x-wav";
-        } else if(url.toString().contains(".rtf")) {
-            // RTF file
-            return "application/rtf";
-        } else if(url.toString().contains(".wav") || url.toString().contains(".mp3")) {
-            // WAV audio file
-            return "audio/x-wav";
-        } else if(url.toString().contains(".gif")) {
-            // GIF file
-            return "image/gif";
-        } else if(url.toString().contains(".jpg") || url.toString().contains(".jpeg") || url.toString().contains(".png")) {
-            // JPG file
-            return "image/jpeg";
-        } else if(url.toString().contains(".txt")) {
-            // Text file
-            return "text/plain";
-        } else if(url.toString().contains(".3gp") || url.toString().contains(".mpg") || url.toString().contains(".mpeg") || url.toString().contains(".mpe") || url.toString().contains(".mp4") || url.toString().contains(".avi")) {
-            // Video files
-            return "video/*";
-        } else {
-            //if you want you can also define the intent type for any other file
 
-            //additionally use else clause below, to manage other unknown extensions
-            //in this case, Android will show all applications installed on the device
-            //so you can choose which application to use
-            return "*/*";
-        }
-    }
 
 }
