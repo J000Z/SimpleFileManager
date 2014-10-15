@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,12 +16,12 @@ import java.util.List;
 /**
  * Created by jack on 8/31/14.
  */
-public class InteractiveArrayAdapter extends ArrayAdapter<fileItem>{
-    List<fileItem> list = null;
+public class FilesArrayAdapter extends ArrayAdapter<FileItem>{
+    List<FileItem> list = null;
     Context context;
     LayoutInflater inflater;
 
-    public InteractiveArrayAdapter(Context context, List<fileItem> list) {
+    public FilesArrayAdapter(Context context, List<FileItem> list) {
         super(context, R.layout.directory, list);
         this.context = context;
         this.list = list;
@@ -33,12 +32,12 @@ public class InteractiveArrayAdapter extends ArrayAdapter<fileItem>{
         return list.get(i).f;
     }
 
-    public void setSelection(fileItem file, boolean checked) {
+    public void setSelection(FileItem file, boolean checked) {
         list.get(list.indexOf(file)).setSelected(checked);
     }
 
     public void setSelection(File file, boolean checked) {
-        setSelection(new fileItem(file), checked);
+        setSelection(new FileItem(file), checked);
     }
 
     public void setSelection(int position, boolean checked) {
@@ -81,9 +80,9 @@ public class InteractiveArrayAdapter extends ArrayAdapter<fileItem>{
         }
     }
 
-    public List<fileItem> getSelectedfileItems(){
+    public List<FileItem> getSelectedfileItems(){
         System.out.println("getSelectedfileItems:" + selectedCount());
-        List<fileItem> files = new ArrayList<fileItem>();
+        List<FileItem> files = new ArrayList<FileItem>();
         for (int i=0; i<list.size(); i++) {
             if (list.get(i).isSelected) {
                 files.add(list.get(i));
@@ -103,7 +102,7 @@ public class InteractiveArrayAdapter extends ArrayAdapter<fileItem>{
     }
 
     public void remove(){
-        List<fileItem> files = getSelectedfileItems();
+        List<FileItem> files = getSelectedfileItems();
         System.out.println("adapter remove " + files.size());
         for (int i=0; i<files.size(); i++) {
             System.out.println("adapter remove " + files.get(i).getName());
@@ -132,6 +131,7 @@ public class InteractiveArrayAdapter extends ArrayAdapter<fileItem>{
 
     private class ViewHolder {
         private TextView text;
+        private ImageView icon;
         private CheckBox checkBox;
     }
 
@@ -142,6 +142,7 @@ public class InteractiveArrayAdapter extends ArrayAdapter<fileItem>{
             holder = new ViewHolder();
             view = inflater.inflate(R.layout.directory, null);
             holder.text = (TextView) view.findViewById(R.id.text);
+            holder.icon = (ImageView) view.findViewById(R.id.icon);
             //holder.checkBox = (CheckBox) view.findViewById(R.id.checkbox);
             /*
             holder.checkBox.setOnClickListener(new View.OnClickListener() {
@@ -157,6 +158,11 @@ public class InteractiveArrayAdapter extends ArrayAdapter<fileItem>{
         }
         // Capture position and set to the TextViews
         holder.text.setText(list.get(position).getName());
+        if (list.get(position).f.isDirectory()) {
+            holder.icon.setImageResource(R.drawable.file_type_folder);
+        } else {
+            holder.icon.setImageResource(R.drawable.file_type_file);
+        }
         //holder.checkBox.setChecked(list.get(position).isSelected);
         //holder.checkBox.setTag(list.get(position));
         view.setTag(holder);

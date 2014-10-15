@@ -11,18 +11,18 @@ import java.util.Stack;
 /**
  * Created by jack on 9/4/14.
  */
-public class fileOperation {
+public class FileOperation {
     String operation;
     List<File> sourceFiles;
     File destFile;
 
-    fileOperation(String operation, List<File> sourceFiles, File destFile) {
+    FileOperation(String operation, List<File> sourceFiles, File destFile) {
         this.operation = operation;
         this.sourceFiles = sourceFiles;
         this.destFile = destFile;
     }
 
-    fileOperation(String operation, List<File> sourceFiles) {
+    FileOperation(String operation, List<File> sourceFiles) {
         this.operation = operation;
         this.sourceFiles = sourceFiles;
         this.destFile = null;

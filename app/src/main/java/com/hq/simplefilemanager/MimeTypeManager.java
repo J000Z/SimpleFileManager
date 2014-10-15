@@ -5,7 +5,7 @@ import java.io.File;
 /**
  * Created by jack on 9/25/14.
  */
-public class typeManager {
+public class MimeTypeManager {
     public static String getMimeType(File url){
         return getMimeType(url.getName());
     }
@@ -38,12 +38,14 @@ public class typeManager {
         } else if(file_name.contains(".jpg") || file_name.contains(".jpeg") || file_name.contains(".png")) {
             // JPG file
             return "image/jpeg";
-        } else if(file_name.contains(".txt")) {
+        } else if(file_name.contains(".txt") || file_name.equals("Text")) {
             // Text file
             return "text/plain";
-        } else if(file_name.contains(".3gp") || file_name.contains(".mpg") || file_name.contains(".mpeg") || file_name.contains(".mpe") || file_name.contains(".mp4") || file_name.contains(".avi")) {
+        } else if(file_name.equals("Video") || file_name.contains(".3gp") || file_name.contains(".mpg") || file_name.contains(".mpeg") || file_name.contains(".mpe") || file_name.contains(".mp4") || file_name.contains(".avi")) {
             // Video files
             return "video/*";
+        } else if(file_name.equals("Audio")) {
+            return "audio/*";
         } else {
             //if you want you can also define the intent type for any other file
 

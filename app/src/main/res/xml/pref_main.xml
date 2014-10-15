@@ -36,7 +36,7 @@
                     android:id="@+id/Application_preference">
             <intent android:action="android.intent.action.view"
                     android:targetPackage="com.hq.simplefilemanager"
-                    android:targetClass="com.hq.simplefilemanager.typeListActivity"/>
+                    android:targetClass="com.hq.simplefilemanager.SettingsFileTypeListActivity"/>
         </Preference>
     </PreferenceCategory>
 

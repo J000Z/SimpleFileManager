@@ -17,9 +17,9 @@
         android:layout_height="wrap_content"
         android:text=".txt"
         android:singleLine="true"
-        android:textSize="40sp"
+        android:textSize="40dp"
         android:layout_weight="1"
-        android:layout_margin="10sp" />
+        android:layout_margin="10dp" />
         <!--
         <Button
             android:layout_width="wrap_content"
@@ -33,45 +33,51 @@
     <View
         android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft="10sp"
-        android:layout_marginRight="10sp"
-        android:background="@android:color/black"/>
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@android:color/darker_gray"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Preferred application for viewing"
         android:singleLine="true"
-        android:textSize="20sp"
-        android:layout_margin="10sp" />
+        android:textSize="20dp"
+        android:layout_margin="10dp" />
 
-    <GridLayout
+    <GridView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/gridlayout_open"
-        android:layout_margin="10sp"
-        ></GridLayout>
+        android:layout_margin="10dp"
+        android:columnWidth="@dimen/gridViewImageWidth"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="5dp"
+        android:horizontalSpacing="5dp"
+        android:stretchMode="columnWidth"
+        android:gravity="center"
+        ></GridView>
 
     <View
         android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft="10sp"
-        android:layout_marginRight="10sp"
-        android:background="@android:color/black"/>
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@android:color/darker_gray"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Preferred application for sharing"
         android:singleLine="true"
-        android:textSize="20sp"
-        android:layout_margin="10sp" />
+        android:textSize="20dp"
+        android:layout_margin="10dp" />
 
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/gridlayout_share"
-        android:layout_margin="10sp"
+        android:layout_margin="10dp"
         ></GridLayout>
 
 </LinearLayout>

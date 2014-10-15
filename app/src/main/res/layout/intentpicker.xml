@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/icon"
+        android:scaleType="centerCrop"
+        android:layout_width="@dimen/gridViewImageWidth"
+        android:layout_height="@dimen/gridViewImageWidth" />
+
+    <TextView
+        android:id="@+id/text"
+        android:textSize="20dp"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:layout_width="match_parent"
+        android:text="test test test"
+        android:gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:layout_height="@dimen/gridViewImageWidth" />
+
+</LinearLayout>

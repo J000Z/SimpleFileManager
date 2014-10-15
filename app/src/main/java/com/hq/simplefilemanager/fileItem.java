@@ -5,11 +5,11 @@ import java.io.File;
 /**
  * Created by jack on 9/1/14.
  */
-public class fileItem {
+public class FileItem {
     File f;
     boolean isSelected;
 
-    fileItem(File f){
+    FileItem(File f){
         this.f = f;
         isSelected = false;
     }
@@ -18,7 +18,7 @@ public class fileItem {
         return f.getName();
     }
 
-    boolean equals(fileItem ff){
+    boolean equals(FileItem ff){
         return f.equals(ff.f);
     }
 

@@ -3,22 +3,20 @@ package com.hq.simplefilemanager;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.DialogFragment;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
-public class typeListActivity extends Activity
+public class SettingsFileTypeListActivity extends Activity
                               implements NoticeDialogFragment.NoticeDialogListener{
 
     AppPreferenceManager p_manager;
+    int OPEN_SETTING_REQUEST = 1;
+    int SETTING_CHANGED = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +81,21 @@ public class typeListActivity extends Activity
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == OPEN_SETTING_REQUEST) {
+            // Make sure the request was successful
+            if (resultCode == SETTING_CHANGED) {
+                // The user picked a contact.
+                // The Intent's data Uri identifies which contact was selected.
+                String file_type = data.getStringExtra("file_type");
+                refresh();
+                // Do something with the contact here (bigger example below)
+            }
+        }
+    }
+
     public void refresh(){
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.main_LinearLayout);
 
@@ -107,10 +120,10 @@ public class typeListActivity extends Activity
                 @Override
                 public void onClick(View view) {
                     System.out.println("Open preference for " + view.getTag());
-                    Intent intent = new Intent(typeListActivity.this, typeActivity.class);
+                    Intent intent = new Intent(SettingsFileTypeListActivity.this, SettingsFileTypeSoloActivity.class);
                     intent.putExtra("file_type", (String) view.getTag());
                     //startActivity(intent);
-                    startActivityForResult(intent, 1);//1 for copy
+                    startActivityForResult(intent, OPEN_SETTING_REQUEST);//request_code
                 }
             });
 

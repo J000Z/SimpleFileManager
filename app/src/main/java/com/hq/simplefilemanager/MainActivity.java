@@ -4,45 +4,28 @@ import android.app.ActionBar;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
-import android.print.PrintAttributes;
 import android.support.v4.app.FragmentActivity;
 import android.view.ActionMode;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 
-public class MyActivity extends FragmentActivity
+public class MainActivity extends FragmentActivity
                         implements NoticeDialogFragment.NoticeDialogListener {
 
 
@@ -50,17 +33,17 @@ public class MyActivity extends FragmentActivity
     File currentDirectory = null;
     File[] currentFiles;
     ListView listView;
-    InteractiveArrayAdapter adapter;
+    FilesArrayAdapter adapter;
     ActionMode Mode = null;
     boolean exitByBackButton = false;
     private static Context context;
 
-    public class fileTask extends AsyncTask<fileOperation, Void, Integer> {
+    public class fileTask extends AsyncTask<FileOperation, Void, Integer> {
         ProgressDialogFragment dialog = new ProgressDialogFragment();
-        fileOperation fileOperation;
+        FileOperation fileOperation;
 
         @Override
-        protected Integer doInBackground(fileOperation... fileOperations) {
+        protected Integer doInBackground(FileOperation... fileOperations) {
             this.fileOperation = fileOperations[0];
             return this.fileOperation.execute();
         }
@@ -97,7 +80,7 @@ public class MyActivity extends FragmentActivity
         // User touched the dialog's positive button
         System.out.println("Delete confirmed");
         fileTask task = new fileTask();
-        task.execute(new fileOperation("delete",adapter.getSelectedFiles()));
+        task.execute(new FileOperation("delete",adapter.getSelectedFiles()));
         Mode.finish();
     }
 
@@ -138,7 +121,7 @@ public class MyActivity extends FragmentActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
-        MyActivity.context = getApplicationContext();
+        MainActivity.context = getApplicationContext();
 
         listView = (ListView) findViewById(R.id.listView);
         currentFiles = getDirectory();
@@ -160,7 +143,7 @@ public class MyActivity extends FragmentActivity
                 } else {
                     Uri uri = Uri.fromFile(currentFiles[position]);
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(uri, typeManager.getMimeType(currentFiles[position]));
+                    intent.setDataAndType(uri, MimeTypeManager.getMimeType(currentFiles[position]));
                     startActivity(intent);
                 }
             }
@@ -175,7 +158,7 @@ public class MyActivity extends FragmentActivity
                 // Here you can do something when items are selected/de-selected,
                 // such as update the title in the CAB
                 System.out.println("statechanged " + adapter.getFile(position).getName());
-                ((InteractiveArrayAdapter)listView.getAdapter()).setSelection(position, checked);
+                ((FilesArrayAdapter)listView.getAdapter()).setSelection(position, checked);
                 if (adapter.selectedCount() == 1) {
                     mode.getMenu().findItem(R.id.edit).setVisible(true);
                 } else {
@@ -196,13 +179,13 @@ public class MyActivity extends FragmentActivity
                 switch (item.getItemId()) {
                     case R.id.cut:
                         Mode = mode;
-                        Intent intent1 = new Intent(MyActivity.this,Selection_activity.class);
+                        Intent intent1 = new Intent(MainActivity.this,FilePickerActivity.class);
                         intent1.putExtra("currentDirectory",currentDirectory.getAbsolutePath());
                         startActivityForResult(intent1,0);//0 for cut
                         return true;
                     case R.id.copy:
                         Mode = mode;
-                        Intent intent2 = new Intent(MyActivity.this,Selection_activity.class);
+                        Intent intent2 = new Intent(MainActivity.this,FilePickerActivity.class);
                         intent2.putExtra("currentDirectory",currentDirectory.getAbsolutePath());
                         startActivityForResult(intent2,1);//1 for copy
                         return true;
@@ -251,7 +234,7 @@ public class MyActivity extends FragmentActivity
             public void onDestroyActionMode(ActionMode mode) {
                 // Here you can make any necessary updates to the activity when
                 // the CAB is removed. By default, selected items are deselected/unchecked.
-                ((InteractiveArrayAdapter)listView.getAdapter()).unselectAll();
+                ((FilesArrayAdapter)listView.getAdapter()).unselectAll();
             }
 
             @Override
@@ -276,13 +259,13 @@ public class MyActivity extends FragmentActivity
         System.out.println("get >> " + selectedDirectory);
         if (requestCode == 0 && resultCode == 0) { //for cut
             fileTask task = new fileTask();
-            task.execute(new fileOperation("cut",adapter.getSelectedFiles(),new File(selectedDirectory)));
+            task.execute(new FileOperation("cut",adapter.getSelectedFiles(),new File(selectedDirectory)));
             currentDirectory = new File(selectedDirectory);
             Mode.finish();
         }
         if (requestCode == 1 && resultCode == 0) { //for copy
             fileTask task = new fileTask();
-            task.execute(new fileOperation("copy",adapter.getSelectedFiles(),new File(selectedDirectory)));
+            task.execute(new FileOperation("copy",adapter.getSelectedFiles(),new File(selectedDirectory)));
             currentDirectory = new File(selectedDirectory);
             Mode.finish();
         }
@@ -302,7 +285,7 @@ public class MyActivity extends FragmentActivity
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Intent intent = new Intent(MyActivity.this, SettingsActivity.class);
+                Intent intent = new Intent(MainActivity.this, SettingsMainActivity.class);
                 startActivity(intent);
                 //SettingsFragment settingsFragment = new SettingsFragment();
                 //settingsFragment
@@ -376,11 +359,11 @@ public class MyActivity extends FragmentActivity
 
     public void inflateListView(File[] files){
 
-        List<fileItem> file_list = new ArrayList<fileItem>();
+        List<FileItem> file_list = new ArrayList<FileItem>();
         for (int i=0; i<files.length; i++){
-            file_list.add(new fileItem(files[i]));
+            file_list.add(new FileItem(files[i]));
         }
-        adapter = new InteractiveArrayAdapter(this,file_list);
+        adapter = new FilesArrayAdapter(this,file_list);
         listView.setAdapter(adapter);
 
     }

@@ -9,6 +9,6 @@
         android:layout_height="1dp"
         android:layout_marginLeft="10sp"
         android:layout_marginRight="10sp"
-        android:background="@android:color/black"/>
+        android:background="@android:color/darker_gray"/>
 
 </LinearLayout>
