@@ -6,6 +6,16 @@ import java.io.File;
  * Created by jack on 9/25/14.
  */
 public class MimeTypeManager {
+
+    public static String getPostFix(String s) {
+        String pattern = ".*(\\.\\S+)";
+        if (s.matches(pattern)) {
+            return s.replaceAll(pattern,"$1");
+        } else {
+            return null;
+        }
+    }
+
     public static String getMimeType(File url){
         return getMimeType(url.getName());
     }

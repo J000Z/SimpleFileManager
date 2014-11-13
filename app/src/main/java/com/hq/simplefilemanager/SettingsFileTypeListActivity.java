@@ -1,39 +1,46 @@
 package com.hq.simplefilemanager;
 
 import android.app.ActionBar;
-import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.ListView;
 
-public class SettingsFileTypeListActivity extends Activity
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class SettingsFileTypeListActivity extends ListActivity
                               implements NoticeDialogFragment.NoticeDialogListener{
 
     AppPreferenceManager p_manager;
-    int OPEN_SETTING_REQUEST = 1;
-    int SETTING_CHANGED = 1;
+    SettingsFileTypeListAdapter mAdapter;
+    PackageManager pk;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.type_list);
         //typeListActivity.context = getApplicationContext();
-
-
-
         ActionBar actionBar = getActionBar();
         actionBar.setTitle("Application preference");
         //actionBar.setDisplayHomeAsUpEnabled(false);
         //actionBar.setDisplayShowTitleEnabled(true);
-
+        pk = getPackageManager();
         p_manager = new AppPreferenceManager(getSharedPreferences("app_preference",MODE_PRIVATE));
         refresh();
-
     }
 
     @Override
@@ -81,56 +88,101 @@ public class SettingsFileTypeListActivity extends Activity
 
     }
 
+    public void refresh(){
+        String[] file_types = p_manager.getTypes();
+        mAdapter = new SettingsFileTypeListAdapter(R.layout.type_list, getApplicationContext(), Arrays.asList(file_types), pk, p_manager);
+        setListAdapter(mAdapter);
+    }
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Check which request we're responding to
-        if (requestCode == OPEN_SETTING_REQUEST) {
-            // Make sure the request was successful
-            if (resultCode == SETTING_CHANGED) {
-                // The user picked a contact.
-                // The Intent's data Uri identifies which contact was selected.
-                String file_type = data.getStringExtra("file_type");
-                refresh();
-                // Do something with the contact here (bigger example below)
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        String type = mAdapter.getItem(position);
+        System.out.println("Open preference for " + type);
+        pickIntent(type);
+        //Intent intent = new Intent(SettingsFileTypeListActivity.this, SettingsFileTypeSoloActivity.class);
+        //intent.putExtra("file_type", type);
+        //startActivityForResult(intent, OPEN_SETTING_REQUEST);//request_code
+    }
+
+    private void pickIntent(String type) {
+        final String file_type = type;
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Uri uri = Uri.fromFile(new File("/tmp/xxx" + file_type));
+        intent.setDataAndType(uri, MimeTypeManager.getMimeType(file_type));
+
+        List<ResolveInfo> resInfo = pk.queryIntentActivities(intent, 0);
+
+        final String[] names = new String[resInfo.size()];
+        final String[] packageNames = new String[resInfo.size()];
+        final String[] labels = new String[resInfo.size()];
+        Drawable[] icons = new Drawable[resInfo.size()];
+        for (int i = 0; i < resInfo.size(); i++) {
+            names[i] = resInfo.get(i).activityInfo.name;
+            packageNames[i] = resInfo.get(i).activityInfo.packageName;
+            labels[i] = (String) resInfo.get(i).loadLabel(pk);
+            icons[i] = resInfo.get(i).loadIcon(pk);
+        }
+
+        final Boolean[] checkedItems = new Boolean[labels.length];
+        if (p_manager.getAppsOfType(file_type) != null) {
+            List<String> apps = Arrays.asList(p_manager.getAppsOfType(file_type));
+            for (int i = 0; i < labels.length; i++) {
+                if (apps.contains(encodeInfo(packageNames[i], names[i]))) {
+                    checkedItems[i] = true;
+                } else {
+                    checkedItems[i] = false;
+                }
+            }
+        } else {
+            for (int i = 0; i < labels.length; i++) {
+                checkedItems[i] = false;
             }
         }
+        System.out.println(Arrays.asList(checkedItems));
+
+        final ArrayAdapterWithIconAndCheckBox listAdapter = new ArrayAdapterWithIconAndCheckBox(this, labels, icons, checkedItems);
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this)
+                .setTitle("Select App")
+                .setSingleChoiceItems(listAdapter, -1, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int index) {
+                        //String app = encodeInfo(packageNames[index], names[index]);
+                        //p_manager.addAppOfType(file_type, app);
+                        //refresh();
+                        //System.out.println("select: " + packageNames[index] + " " + names[index]);
+                        //Toast.makeText(activity, "Item Selected: " + item, Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        List<Boolean> checkedItems = listAdapter.getCheckedItems();
+                        List<String> apps = new ArrayList<String>();
+                        for (int j=0; j<checkedItems.size(); j++) {
+                            if (checkedItems.get(j)) {
+                                apps.add(encodeInfo(packageNames[j],names[j]));
+                            }
+                        }
+                        String[] appsArray = new String[apps.size()];
+                        apps.toArray(appsArray); // fill the array
+                        p_manager.setAppOfType(file_type, appsArray);
+                        refresh();
+                        System.out.println(checkedItems);
+                    }
+                });
+        dialog.show();
     }
 
-    public void refresh(){
-        LinearLayout mainLayout = (LinearLayout) findViewById(R.id.main_LinearLayout);
-
-        mainLayout.removeAllViews();
-        String[] default_cat = {"Video", "Audio", "Text"};
-        addTypeViews(mainLayout,default_cat);
-
-        View horizontal_line = getLayoutInflater().inflate(R.layout.horizontal_line, null);
-        mainLayout.addView(horizontal_line);
-
-        String[] file_types = p_manager.getTypes();
-        addTypeViews(mainLayout,file_types);
+    private String encodeInfo(String packageName, String name) {
+        return "[" + packageName + " " + name + "]";
     }
 
-    public void addTypeViews(LinearLayout layout, final String[] types){
-        for (int i=0; i<types.length; i++) {
-            type_view v = new type_view(this,types[i]);
-            v.setTag(types[i]);
-            v.setClickable(true);
-
-            v.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    System.out.println("Open preference for " + view.getTag());
-                    Intent intent = new Intent(SettingsFileTypeListActivity.this, SettingsFileTypeSoloActivity.class);
-                    intent.putExtra("file_type", (String) view.getTag());
-                    //startActivity(intent);
-                    startActivityForResult(intent, OPEN_SETTING_REQUEST);//request_code
-                }
-            });
-
-            layout.addView(v);
-        }
+    private String[] decodeInfo(String app) {
+        String[] info = app.substring(1,app.length()-1).split(" ");
+        return  info;
     }
-
-
-
 }

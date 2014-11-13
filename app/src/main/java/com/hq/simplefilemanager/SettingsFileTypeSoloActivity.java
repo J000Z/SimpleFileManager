@@ -10,23 +10,19 @@ import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.GridLayout;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SettingsFileTypeSoloActivity extends FragmentActivity{
@@ -35,7 +31,7 @@ public class SettingsFileTypeSoloActivity extends FragmentActivity{
     AppPreferenceManager p_manager;
     String file_type;
     GridView gridView_open;
-    GridLayout gridlayout_share;
+    //GridLayout gridlayout_share;
     boolean SETTING_CHANGED = false;
     final Activity activity = (Activity) this;
 
@@ -55,14 +51,12 @@ public class SettingsFileTypeSoloActivity extends FragmentActivity{
         //actionBar.setDisplayHomeAsUpEnabled(false);
         //actionBar.setDisplayShowTitleEnabled(true);
         gridView_open = (GridView) findViewById(R.id.gridlayout_open);
-        gridlayout_share = (GridLayout) findViewById(R.id.gridlayout_share);
+        //gridlayout_share = (GridLayout) findViewById(R.id.gridlayout_share);
         p_manager = new AppPreferenceManager(getSharedPreferences("app_preference",MODE_PRIVATE));
         pk = getPackageManager();
         gridView_open.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                if (v.getTag()!=null && v.getTag().equals("add")) {
-                    ShowIntentPicker();
-                }
+                ShowIntentPicker();
             }
         });
         refresh();
@@ -97,8 +91,8 @@ public class SettingsFileTypeSoloActivity extends FragmentActivity{
             System.out.println("intent num: " + apps.length);
             icons = new Drawable[apps.length];
             for (int i=0; i<apps.length; i++) {
-                String packageName = decodeInfo(apps[i])[0];
-                String name = decodeInfo(apps[i])[1];
+                String packageName = p_manager.decodeInfo(apps[i])[0];
+                String name = p_manager.decodeInfo(apps[i])[1];
                 System.out.println("[" + i + "] " + packageName + " " + name);
                 Intent intent = new Intent();
                 intent.setClassName(packageName, name);
@@ -128,20 +122,59 @@ public class SettingsFileTypeSoloActivity extends FragmentActivity{
             icons[i] = resInfo.get(i).loadIcon(pk);
         }
 
+        final Boolean[] checkedItems = new Boolean[labels.length];
+        if (p_manager.getAppsOfType(file_type) != null) {
+            List<String> apps = Arrays.asList(p_manager.getAppsOfType(file_type));
+            for (int i = 0; i < labels.length; i++) {
+                if (apps.contains(p_manager.encodeInfo(packageNames[i], names[i]))) {
+                    checkedItems[i] = true;
+                } else {
+                    checkedItems[i] = false;
+                }
+            }
+        } else {
+            for (int i = 0; i < labels.length; i++) {
+                checkedItems[i] = false;
+            }
+        }
+        System.out.println(Arrays.asList(checkedItems));
+        final ArrayAdapterWithIconAndCheckBox listAdapter = new ArrayAdapterWithIconAndCheckBox(activity, labels, icons, checkedItems);
 
-        ListAdapter adapter = new ArrayAdapterWithIcon(activity, labels, icons);
-
-        new AlertDialog.Builder(activity).setTitle("Select App")
-                .setAdapter(adapter, new DialogInterface.OnClickListener() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(activity)
+                .setTitle("Select App")
+                .setSingleChoiceItems(listAdapter, -1, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int index) {
-                        String app = encodeInfo(packageNames[index], names[index]);
-                        p_manager.addAppOfType(file_type, app);
-                        SETTING_CHANGED = true;
-                        refresh();
+                        //String app = encodeInfo(packageNames[index], names[index]);
+                        //p_manager.addAppOfType(file_type, app);
+                        //SETTING_CHANGED = true;
+                        //refresh();
                         System.out.println("select: " + packageNames[index] + " " + names[index]);
                         //Toast.makeText(activity, "Item Selected: " + item, Toast.LENGTH_SHORT).show();
                     }
-                }).show();
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        List<Boolean> checkedItems = listAdapter.getCheckedItems();
+                        List<String> apps = new ArrayList<String>();
+                        for (int j=0; j<checkedItems.size(); j++) {
+                            if (checkedItems.get(j)) {
+                                apps.add(p_manager.encodeInfo(packageNames[j], names[j]));
+                            }
+                        }
+                        String[] appsArray = new String[apps.size()];
+                        apps.toArray(appsArray); // fill the array
+                        p_manager.setAppOfType(file_type, appsArray);
+                        refresh();
+                        System.out.println(checkedItems);
+                    }
+                });
+        dialog.show();
 
     }
 
@@ -159,15 +192,6 @@ public class SettingsFileTypeSoloActivity extends FragmentActivity{
         intent.putExtra("file_type",file_type);
         SettingsFileTypeSoloActivity.this.setResult(SETTING_CHANGED_FLAG,intent);
         SettingsFileTypeSoloActivity.this.finish();
-    }
-
-    public String encodeInfo(String packageName, String name) {
-        return "[" + packageName + " " + name + "]";
-    }
-
-    public String[] decodeInfo(String app) {
-        String[] info = app.substring(1,app.length()-1).split(" ");
-        return  info;
     }
 
 }

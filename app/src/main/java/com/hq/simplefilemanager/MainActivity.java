@@ -1,9 +1,14 @@
 package com.hq.simplefilemanager;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -23,6 +28,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends FragmentActivity
@@ -131,20 +137,26 @@ public class MainActivity extends FragmentActivity
             currentDirectory = Environment.getExternalStorageDirectory();
         }
 
+        //click on the file or folder item in the list
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 System.out.println(currentFiles[position].getName() + " clicked");
                 if (currentFiles[position].isDirectory()) {
+                    //enter the directory
                     currentDirectory = currentFiles[position];
                     currentFiles = getDirectory(currentDirectory.getAbsolutePath());
                     inflateListView(currentFiles);
                     exitByBackButton = false;
                 } else {
+                    //open the file
+                    openFile(currentFiles[position]);
+                    /*
                     Uri uri = Uri.fromFile(currentFiles[position]);
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setDataAndType(uri, MimeTypeManager.getMimeType(currentFiles[position]));
                     startActivity(intent);
+                    */
                 }
             }
         });
@@ -366,6 +378,145 @@ public class MainActivity extends FragmentActivity
         adapter = new FilesArrayAdapter(this,file_list);
         listView.setAdapter(adapter);
 
+    }
+
+    public void openFile(File f) {
+        Uri uri = Uri.fromFile(f);
+        String MimeType = MimeTypeManager.getMimeType(f);
+        String postFix = MimeTypeManager.getPostFix(f.getName());;
+        AppPreferenceManager p_manager = new AppPreferenceManager(getSharedPreferences("app_preference",MODE_PRIVATE));
+        if (p_manager.isFileTypeExist(postFix)) {
+            String[] apps = p_manager.getAppsOfType(postFix);
+            if (apps.length == 1) { //open directly
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(uri, MimeType);
+                intent.setClassName(p_manager.decodePackageName(apps[0]), p_manager.decodeName(apps[0]));
+                startActivity(intent);
+                return;
+            } else {
+                openWithDialog(f, apps, p_manager);
+                return;
+            }
+        } else {
+            openWithDialog(f);
+            return;
+        }
+    }
+
+    public void openWithDialog(File file) { //the default one
+        final File f = file;
+        PackageManager pk = getPackageManager();
+        final Intent intent = new Intent(Intent.ACTION_VIEW);
+        final String type = MimeTypeManager.getMimeType(f);
+        Uri uri = Uri.fromFile(f);
+        intent.setDataAndType(uri, type);
+        List<ResolveInfo> resInfo = pk.queryIntentActivities(intent, 0);
+        int length = resInfo.size();
+        final String[] names = new String[length];
+        final String[] packageNames = new String[length];
+        final String[] labels = new String[length];
+        final Drawable[] icons = new Drawable[length];
+        for (int i = 0; i < resInfo.size(); i++) {
+            names[i] = resInfo.get(i).activityInfo.name;
+            packageNames[i] = resInfo.get(i).activityInfo.packageName;
+            labels[i] = (String) resInfo.get(i).loadLabel(pk);
+            icons[i] = resInfo.get(i).loadIcon(pk);
+        }
+        final ArrayAdapterWithIcon listAdapter = new ArrayAdapterWithIcon(this, labels, icons);
+        final myInt selectIndex = new myInt(-1);
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(this)
+                .setTitle("Open with")
+                .setSingleChoiceItems(listAdapter, -1, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int index) {
+                        if (index == selectIndex.get()) {
+                            intent.setClassName(packageNames[selectIndex.get()], names[selectIndex.get()]);
+                            startActivity(intent);
+                            dialog.dismiss();
+                        }
+                        System.out.println("click: " + packageNames[index] + " " + names[index]);
+                        listAdapter.selectItem(index);
+                        selectIndex.set(index);
+                    }
+                })
+                .setPositiveButton("Always", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String postFix = MimeTypeManager.getPostFix(f.getName());
+                        System.out.println("add app to type: " + postFix);
+                        AppPreferenceManager p_manager = new AppPreferenceManager(getSharedPreferences("app_preference",MODE_PRIVATE));
+                        p_manager.addAppOfType(postFix, p_manager.encodeInfo(packageNames[selectIndex.get()], names[selectIndex.get()]));
+                        intent.setClassName(packageNames[selectIndex.get()], names[selectIndex.get()]);
+                        startActivity(intent);
+                    }
+                })
+                .setNeutralButton("Just once", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        intent.setClassName(packageNames[selectIndex.get()], names[selectIndex.get()]);
+                        startActivity(intent);
+                    }
+                });
+        dialog.show();
+    }
+
+    public class myInt{
+        private int v;
+
+        myInt(int v) {
+            this.v = v;
+        }
+
+        public void set(int v) {
+            this.v = v;
+        }
+
+        public int get() {
+            return v;
+        }
+    }
+
+    public void openWithDialog(File file, String[] apps_array, AppPreferenceManager p_manager) {
+        List<String> apps = Arrays.asList(apps_array);
+        final File f = file;
+        PackageManager pk = getPackageManager();
+        final Intent intent = new Intent(Intent.ACTION_VIEW);
+        String type = MimeTypeManager.getMimeType(f);
+        Uri uri = Uri.fromFile(f);
+        intent.setDataAndType(uri, type);
+        List<ResolveInfo> resInfo = pk.queryIntentActivities(intent, 0);
+        final List<String> names = new ArrayList<String>();
+        final List<String> packageNames = new ArrayList<String>();
+        final List<String> labels = new ArrayList<String>();
+        final List<Drawable> icons = new ArrayList<Drawable>();
+        for (int i = 0; i < resInfo.size(); i++) {
+            String packageName = resInfo.get(i).activityInfo.packageName;
+            String name = resInfo.get(i).activityInfo.name;
+            if (apps.contains(p_manager.encodeInfo(packageName, name))) {
+                names.add(name);
+                packageNames.add(packageName);
+                labels.add((String) resInfo.get(i).loadLabel(pk));
+                icons.add(resInfo.get(i).loadIcon(pk));
+            }
+        }
+        System.out.print(labels);
+        final ArrayAdapterWithIcon listAdapter = new ArrayAdapterWithIcon(this, labels, icons);
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this)
+                .setTitle("Open with")
+                .setSingleChoiceItems(listAdapter, -1, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int index) {
+                        intent.setClassName(packageNames.get(index), names.get(index));
+                        startActivity(intent);
+                        dialog.dismiss();
+                        System.out.println("click: " + packageNames.get(index) + " " + names.get(index));
+                    }
+                })
+                .setNegativeButton("More", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        openWithDialog(f);
+                    }
+                });
+        dialog.show();
     }
 
 

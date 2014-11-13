@@ -23,11 +23,7 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     public int getCount() {
-        if (images == null) {
-            return 1;
-        } else {
-            return images.length + 1;
-        }
+        return images.length;
     }
 
     public Object getItem(int position) {
@@ -50,13 +46,8 @@ public class ImageAdapter extends BaseAdapter {
         } else {
             imageView = (ImageView) convertView;
         }
-
-        if (position == getCount()-1) {
-            imageView.setTag("add");
-            imageView.setImageResource(R.drawable.plus);
-        } else {
-            imageView.setImageDrawable(images[position]);
-        }
+        imageView.setClickable(false);
+        imageView.setImageDrawable(images[position]);
         return imageView;
     }
 }

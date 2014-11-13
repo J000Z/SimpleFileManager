@@ -18,6 +18,7 @@ public class AppPreferenceManager {
     }
 
     public boolean isFileTypeExist(String file_type) {
+        if (file_type == null || file_type.length() == 0) return false;
         return preferences.contains(file_type);
     }
 
@@ -34,7 +35,7 @@ public class AppPreferenceManager {
     }
 
     public void addType(String file_type) {
-        if (file_type.length() == 0 || !file_type.startsWith(".")){
+        if (file_type == null || file_type.length() == 0 || !file_type.startsWith(".")){
             return;
         }
         if (file_type.contains(splitter)) {
@@ -83,7 +84,7 @@ public class AppPreferenceManager {
 
     public void addAppOfType(String file_type, String app){
         if (!isFileTypeExist(file_type)) {
-            return;
+            addType(file_type);
         }
         String ss_list = preferences.getString(file_type, null);
         if (ss_list == null) {
@@ -116,5 +117,22 @@ public class AppPreferenceManager {
         editor.putString(TypeList_key,ss_list);
         editor.remove(file_type);
         editor.commit();
+    }
+
+    public String encodeInfo(String packageName, String name) {
+        return "[" + packageName + " " + name + "]";
+    }
+
+    public String[] decodeInfo(String app) {
+        String[] info = app.substring(1,app.length()-1).split(" ");
+        return  info;
+    }
+
+    public String decodePackageName(String app) {
+        return decodeInfo(app)[0];
+    }
+
+    public String decodeName(String app) {
+        return decodeInfo(app)[1];
     }
 }

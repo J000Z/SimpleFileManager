@@ -2,32 +2,31 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:padding="10sp"
-    android:layout_height="match_parent">
+    android:padding="15dp"
+    android:gravity="center_vertical"
+    android:descendantFocusability="blocksDescendants"
+    android:layout_height="wrap_content">
 
-    <LinearLayout
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/text"
+        android:textSize="20dp"
+        android:layout_weight="1"
+        android:textColor="#FF000000"
+        />
+
+    <HorizontalScrollView
+        android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="New Text"
-            android:id="@+id/text"
-            android:textSize="20dp"
-            android:layout_weight="1"
-            />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_gravity="right"
-        android:gravity="right"
-        android:id="@+id/listView"
-        android:layout_weight="1" >
-    </LinearLayout>
-
+        <LinearLayout
+            android:layout_gravity="right"
+            android:id="@+id/linearLayout"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"></LinearLayout>
+    </HorizontalScrollView>
 
 </LinearLayout>
