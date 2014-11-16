@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
 import java.io.File;
@@ -36,6 +37,7 @@ public class MainActivity extends FragmentActivity
 
 
 
+    private ShareActionProvider mShareActionProvider;
     File currentDirectory = null;
     File[] currentFiles;
     ListView listView;
@@ -126,7 +128,7 @@ public class MainActivity extends FragmentActivity
         //SharedPreferences p = getApplicationContext().getSharedPreferences("app_preference", MODE_PRIVATE);
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my);
+        setContentView(R.layout.main_activity);
         MainActivity.context = getApplicationContext();
 
         listView = (ListView) findViewById(R.id.listView);
@@ -151,12 +153,6 @@ public class MainActivity extends FragmentActivity
                 } else {
                     //open the file
                     openFile(currentFiles[position]);
-                    /*
-                    Uri uri = Uri.fromFile(currentFiles[position]);
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(uri, MimeTypeManager.getMimeType(currentFiles[position]));
-                    startActivity(intent);
-                    */
                 }
             }
         });
@@ -181,6 +177,7 @@ public class MainActivity extends FragmentActivity
                 } else {
                     mode.getMenu().findItem(R.id.select).setTitle("Select all");
                 }
+                setShareIntent((((FilesArrayAdapter) listView.getAdapter()).getSelectedFiles()), mode.getMenu());
                 //final int checkedCount = ((InteractiveArrayAdapter)listView.getAdapter()).selectedCount();
                 //mode.setTitle(checkedCount + " Selected");
             }
@@ -238,7 +235,10 @@ public class MainActivity extends FragmentActivity
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                 // Inflate the menu for the CAB
                 MenuInflater inflater = mode.getMenuInflater();
-                inflater.inflate(R.menu.action_multiselection, menu);
+                inflater.inflate(R.menu.menu_main_activity_multi_selection, menu);
+                MenuItem item = menu.findItem(R.id.share);
+                // Fetch and store ShareActionProvider
+                mShareActionProvider = (ShareActionProvider) item.getActionProvider();
                 return true;
             }
 
@@ -287,7 +287,7 @@ public class MainActivity extends FragmentActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.my, menu);
+        inflater.inflate(R.menu.menu_main_activity, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -519,6 +519,57 @@ public class MainActivity extends FragmentActivity
         dialog.show();
     }
 
-
+    private void setShareIntent(List<File> files, Menu menu) {
+        if (mShareActionProvider == null)
+            return;
+        MenuItem shareButton = menu.findItem(R.id.share);
+        if (files.size() == 1) {
+            File f = files.get(0);
+            if (f.isDirectory()) {
+                shareButton.setVisible(false);
+                return;
+            } else {
+                Uri uri = Uri.fromFile(f);
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setDataAndType(uri, MimeTypeManager.getMimeType(f));
+                mShareActionProvider.setShareIntent(intent);
+                shareButton.setVisible(true);
+                return;
+            }
+        } else {
+            ArrayList<Uri> theUris = new ArrayList<Uri>();
+            String theOverallMIMEtype = null;
+            String theMIMEtype = null;
+            String theOverallMIMEcategory = null;
+            String theMIMEcategory = null;
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    shareButton.setVisible(false);
+                    return;
+                }
+                theMIMEtype = MimeTypeManager.getMimeType(f.getName());
+                theMIMEcategory = MimeTypeManager.getMIMECategory(theMIMEtype);
+                if (theOverallMIMEtype!=null) {
+                    if (!theOverallMIMEtype.equals(theMIMEtype)) {
+                        if (!theOverallMIMEcategory.equals(theMIMEcategory)) {
+                            theOverallMIMEtype = "multipart/mixed";
+                            break;  //no need to keep looking at the various types
+                        } else {
+                            theOverallMIMEtype = theOverallMIMEcategory + "/*";
+                        }
+                    }
+                } else {
+                    theOverallMIMEtype = theMIMEtype;
+                    theOverallMIMEcategory = MimeTypeManager.getMIMECategory(theOverallMIMEtype);
+                }
+                theUris.add(Uri.fromFile(f));
+            }
+            Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+            intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, theUris);
+            intent.setType(theOverallMIMEtype);
+            mShareActionProvider.setShareIntent(intent);
+            shareButton.setVisible(true);
+        }
+    }
 
 }

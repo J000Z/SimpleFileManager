@@ -55,7 +55,7 @@ public class SettingsFileTypeListAdapter extends ArrayAdapter<String>{
         final ViewHolder holder;
         if (view == null) {
             holder = new ViewHolder();
-            view = inflater.inflate(R.layout.type_list_adpter, null);
+            view = inflater.inflate(R.layout.settings_file_type_list_adapter, null);
             holder.text = (TextView) view.findViewById(R.id.text);
             holder.linearLayout = (LinearLayout) view.findViewById(R.id.linearLayout);
             view.setTag(holder);

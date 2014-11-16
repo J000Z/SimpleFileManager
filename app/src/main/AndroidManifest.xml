@@ -24,10 +24,6 @@
             android:label="Selection" >
         </activity>
         <activity
-            android:name=".SettingsFileTypeSoloActivity"
-            android:label="Selection" >
-        </activity>
-        <activity
             android:name=".SettingsFileTypeListActivity"
             android:label="Preferred_app_setting" >
         </activity>

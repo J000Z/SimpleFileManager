@@ -66,7 +66,7 @@ public class NoticeDialogFragment extends DialogFragment {
             // Get the layout inflater
             LayoutInflater inflater = getActivity().getLayoutInflater();
             builder.setTitle("New file name:");
-            final View view = inflater.inflate(R.layout.input_dialog, null);
+            final View view = inflater.inflate(R.layout.notice_dialog_fragment, null);
 
             // Inflate and set the layout for the dialog
             // Pass null as the parent view because its going in the dialog layout
@@ -89,7 +89,7 @@ public class NoticeDialogFragment extends DialogFragment {
             // Get the layout inflater
             LayoutInflater inflater = getActivity().getLayoutInflater();
             builder.setTitle("New file folder:");
-            final View view = inflater.inflate(R.layout.input_dialog, null);
+            final View view = inflater.inflate(R.layout.notice_dialog_fragment, null);
             // Inflate and set the layout for the dialog
             // Pass null as the parent view because its going in the dialog layout
             builder.setView(view)
@@ -112,7 +112,7 @@ public class NoticeDialogFragment extends DialogFragment {
             //System.out.println(filename);
             LayoutInflater inflater = getActivity().getLayoutInflater();
             builder.setTitle("New file name:");
-            final View view = inflater.inflate(R.layout.input_dialog, null);
+            final View view = inflater.inflate(R.layout.notice_dialog_fragment, null);
             EditText editText_input = ((EditText) view.findViewById(R.id.input));
             editText_input.setText(filename);
             builder.setView(view)
@@ -133,7 +133,7 @@ public class NoticeDialogFragment extends DialogFragment {
         } else if (getTag().equals("add_preference")) {
             LayoutInflater inflater = getActivity().getLayoutInflater();
             builder.setTitle("File type:");
-            final View view = inflater.inflate(R.layout.input_dialog, null);
+            final View view = inflater.inflate(R.layout.notice_dialog_fragment, null);
             builder.setView(view)
                     // Add action buttons
                     // Add action buttons

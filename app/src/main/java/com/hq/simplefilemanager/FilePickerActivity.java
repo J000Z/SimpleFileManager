@@ -34,7 +34,7 @@ public class FilePickerActivity extends ActionBarActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my);
+        setContentView(R.layout.main_activity);
 
         selectedIndex = -1;
         listView = (ListView) findViewById(R.id.listView);
@@ -88,7 +88,7 @@ public class FilePickerActivity extends ActionBarActivity{
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.selection_activity, menu);
+        inflater.inflate(R.menu.menu_file_picker_activity, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

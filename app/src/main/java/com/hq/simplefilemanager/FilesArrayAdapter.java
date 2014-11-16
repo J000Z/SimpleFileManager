@@ -22,7 +22,7 @@ public class FilesArrayAdapter extends ArrayAdapter<FileItem>{
     LayoutInflater inflater;
 
     public FilesArrayAdapter(Context context, List<FileItem> list) {
-        super(context, R.layout.directory, list);
+        super(context, R.layout.files_array_adapter, list);
         this.context = context;
         this.list = list;
         inflater = LayoutInflater.from(context);
@@ -140,7 +140,7 @@ public class FilesArrayAdapter extends ArrayAdapter<FileItem>{
         final ViewHolder holder;
         if (view == null) {
             holder = new ViewHolder();
-            view = inflater.inflate(R.layout.directory, null);
+            view = inflater.inflate(R.layout.files_array_adapter, null);
             holder.text = (TextView) view.findViewById(R.id.text);
             holder.icon = (ImageView) view.findViewById(R.id.icon);
             //holder.checkBox = (CheckBox) view.findViewById(R.id.checkbox);

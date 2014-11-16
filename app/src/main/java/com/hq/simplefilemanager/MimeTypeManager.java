@@ -1,11 +1,17 @@
 package com.hq.simplefilemanager;
 
+import android.webkit.MimeTypeMap;
+
 import java.io.File;
 
 /**
  * Created by jack on 9/25/14.
  */
 public class MimeTypeManager {
+
+    public static String getMIMECategory(String Mime) {
+        return Mime.replaceAll("(.+?)\\/.*","$1");
+    }
 
     public static String getPostFix(String s) {
         String pattern = ".*(\\.\\S+)";
@@ -16,11 +22,21 @@ public class MimeTypeManager {
         }
     }
 
+    public static String getExtension(String file_name) {
+        if (file_name.contains(".")) {
+            return getPostFix(file_name).substring(1);
+        } else {
+            return file_name;
+        }
+    }
+
     public static String getMimeType(File url){
         return getMimeType(url.getName());
     }
 
     public static String getMimeType(String file_name){
+        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(getExtension(file_name));
+        /*
         if (file_name.contains(".doc") || file_name.contains(".docx")) {
             // Word document
             return "application/msword";
@@ -62,7 +78,7 @@ public class MimeTypeManager {
             //additionally use else clause below, to manage other unknown extensions
             //in this case, Android will show all applications installed on the device
             //so you can choose which application to use
-            return "*/*";
-        }
+            return "*//*";
+        }*/
     }
 }

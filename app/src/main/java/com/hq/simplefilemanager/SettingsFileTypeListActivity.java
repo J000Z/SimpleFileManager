@@ -32,7 +32,7 @@ public class SettingsFileTypeListActivity extends ListActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.type_list);
+        setContentView(R.layout.settings_file_type_list_activity);
         //typeListActivity.context = getApplicationContext();
         ActionBar actionBar = getActionBar();
         actionBar.setTitle("Application preference");
@@ -46,7 +46,7 @@ public class SettingsFileTypeListActivity extends ListActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.type_list_main, menu);
+        inflater.inflate(R.menu.menu_settings_file_type_list_activity, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -90,7 +90,7 @@ public class SettingsFileTypeListActivity extends ListActivity
 
     public void refresh(){
         String[] file_types = p_manager.getTypes();
-        mAdapter = new SettingsFileTypeListAdapter(R.layout.type_list, getApplicationContext(), Arrays.asList(file_types), pk, p_manager);
+        mAdapter = new SettingsFileTypeListAdapter(R.layout.settings_file_type_list_activity, getApplicationContext(), Arrays.asList(file_types), pk, p_manager);
         setListAdapter(mAdapter);
     }
 

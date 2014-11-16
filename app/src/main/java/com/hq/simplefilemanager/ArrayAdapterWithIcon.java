@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 
 import java.util.Arrays;
@@ -21,12 +20,12 @@ public class ArrayAdapterWithIcon extends ArrayAdapter<String> {
     private int selectIndex = -1;
 
     public ArrayAdapterWithIcon(Context context, List<String> items, List<Drawable> images) {
-        super(context, R.layout.intentpicker, R.id.text, items);
+        super(context, R.layout.intent_picker, R.id.text, items);
         this.images = images;
     }
 
     public ArrayAdapterWithIcon(Context context, String[] items, Drawable[] images) {
-        super(context, R.layout.intentpicker, R.id.text, items);
+        super(context, R.layout.intent_picker, R.id.text, items);
         this.images = Arrays.asList(images);
     }
 

@@ -20,12 +20,12 @@ public class ArrayAdapterWithIconAndCheckBox extends ArrayAdapter<String> {
     private List<Boolean> checkedItems;
 
     public ArrayAdapterWithIconAndCheckBox(Context context, List<String> items, List<Drawable> images) {
-        super(context, R.layout.intentpicker_checkbox, R.id.text, items);
+        super(context, R.layout.intent_picker_with_checkbox, R.id.text, items);
         this.images = images;
     }
 
     public ArrayAdapterWithIconAndCheckBox(Context context, String[] items, Drawable[] images, Boolean[] checkedItems) {
-        super(context, R.layout.intentpicker_checkbox, R.id.text, items);
+        super(context, R.layout.intent_picker_with_checkbox, R.id.text, items);
         this.images = Arrays.asList(images);
         this.checkedItems = Arrays.asList(checkedItems);
     }
