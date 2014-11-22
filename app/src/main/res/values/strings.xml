@@ -10,6 +10,9 @@
     <string name="create">Create</string>
     <string name="rename">Rename</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_settings">Settings</string>
     <color name="black">#000000</color>
-
+    <string name="key_show_hidden">pref_key_show_hidden_files</string>
+    <string name="key_sort_by">pref_key_sort_by</string>
+    <string name="key_sort_order">pref_key_sort_order</string>
 </resources>

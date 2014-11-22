@@ -1,6 +1,19 @@
 package com.hq.simplefilemanager;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Created by jack on 9/18/14.
@@ -134,5 +147,100 @@ public class AppPreferenceManager {
 
     public String decodeName(String app) {
         return decodeInfo(app)[1];
+    }
+
+    public static List<File> sortByPreference(File[] files, Context calledActivity) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(calledActivity);
+        boolean showHiddenFile = sharedPref.getBoolean(calledActivity.getString(R.string.key_show_hidden), false);
+        int reference = Integer.parseInt(sharedPref.getString(calledActivity.getString(R.string.key_sort_by), "0"));
+        final int order = Integer.parseInt(sharedPref.getString(calledActivity.getString(R.string.key_sort_order), "0"));
+        System.out.println("reference: " + reference + ", order" + order);
+        List<File> file_list = new ArrayList<File>();
+        List<File> folder_list = new ArrayList<File>();
+        for (int i=0; i<files.length; i++){
+            if (showHiddenFile || files[i].getName().charAt(0) != '.') {
+                if (files[i].isDirectory()) {
+                    folder_list.add(files[i]);
+                } else {
+                    file_list.add(files[i]);
+                }
+            }
+        }
+
+        //sort folder_list
+        Collections.sort(folder_list, new Comparator<File>() {
+            public int compare(File a, File b) {
+                return a.getName().compareTo(b.getName()) * order;
+            }
+        });
+
+        //sort file_list
+        switch (reference) {
+            case 0: //Name
+                System.out.println("sort by name");
+                Collections.sort(file_list, new Comparator<File>() {
+                    public int compare(File a, File b) {
+                        return a.getName().compareTo(b.getName());
+                    }
+                });
+                break;
+            case 1: //Size
+                System.out.println("sort by size");
+                Collections.sort(file_list, new Comparator<File>() {
+                    public int compare(File a, File b) {
+                        if (a.length() - b.length() > 0) {
+                            return 1*order;
+                        } else {
+                            return -1*order;
+                        }
+                    }
+                });
+                break;
+            case 2: //Type
+                System.out.println("sort by type");
+                Collections.sort(file_list, new Comparator<File>() {
+                    public int compare(File a, File b) {
+                        String aExtension = MimeTypeManager.getExtension(a.getName());
+                        String bExtension = MimeTypeManager.getExtension(b.getName());
+                        //System.out.println(aExtension);
+                        return aExtension.compareTo(bExtension) * order;
+                    }
+                });
+                break;
+            case 3: //Last edit time
+                System.out.println("sort by time");
+                Collections.sort(file_list, new Comparator<File>() {
+                    public int compare(File a, File b) {
+                        if (a.lastModified() - b.lastModified() > 0) {
+                            return 1 * order;
+                        } else {
+                            return -1 * order;
+                        }
+                    }
+                });
+                break;
+            default:
+                break;
+        }
+        //
+        folder_list.addAll(file_list);
+        return folder_list;
+    }
+
+    public static int getFileSize(File f){
+        InputStream stream = null;
+        URL url = null;
+        int size = -1;
+        try {
+            url = f.toURI().toURL();
+            stream = url.openStream();
+            size = stream.available();
+            stream.close();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return size;
     }
 }

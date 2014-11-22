@@ -1,6 +1,8 @@
 package com.hq.simplefilemanager;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by jack on 9/1/14.
@@ -27,4 +29,11 @@ public class FileItem {
     }
 
     void delete() {f.delete();}
+
+    public static List<FileItem> fromFileList(List<File> files) {
+        ArrayList<FileItem> fileItems = new ArrayList<FileItem>();
+        for (File x : files)
+            fileItems.add(new FileItem(x));
+        return fileItems;
+    }
 }

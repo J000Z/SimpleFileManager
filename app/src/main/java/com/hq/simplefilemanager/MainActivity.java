@@ -6,6 +6,7 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
@@ -30,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends FragmentActivity
@@ -45,6 +47,10 @@ public class MainActivity extends FragmentActivity
     ActionMode Mode = null;
     boolean exitByBackButton = false;
     private static Context context;
+
+    static int cut_request = 0;
+    static int copy_request = 1;
+    static int preference_request = 3;
 
     public class fileTask extends AsyncTask<FileOperation, Void, Integer> {
         ProgressDialogFragment dialog = new ProgressDialogFragment();
@@ -190,13 +196,13 @@ public class MainActivity extends FragmentActivity
                         Mode = mode;
                         Intent intent1 = new Intent(MainActivity.this,FilePickerActivity.class);
                         intent1.putExtra("currentDirectory",currentDirectory.getAbsolutePath());
-                        startActivityForResult(intent1,0);//0 for cut
+                        startActivityForResult(intent1, cut_request);//0 for cut
                         return true;
                     case R.id.copy:
                         Mode = mode;
                         Intent intent2 = new Intent(MainActivity.this,FilePickerActivity.class);
                         intent2.putExtra("currentDirectory",currentDirectory.getAbsolutePath());
-                        startActivityForResult(intent2,1);//1 for copy
+                        startActivityForResult(intent2,copy_request);//1 for copy
                         return true;
                     case R.id.delete:
                         DialogFragment dialog = new NoticeDialogFragment();
@@ -265,17 +271,24 @@ public class MainActivity extends FragmentActivity
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == preference_request) {
+            if (resultCode == 1) {
+                currentFiles = getDirectory(currentDirectory.getAbsolutePath());
+                inflateListView(currentFiles);
+            }
+            return;
+        }
         if (resultCode == -1) {return;}
         Bundle data = intent.getExtras();
         String selectedDirectory = data.getString("selectedDirectory");
         System.out.println("get >> " + selectedDirectory);
-        if (requestCode == 0 && resultCode == 0) { //for cut
+        if (requestCode == cut_request && resultCode == 0) { //for cut
             fileTask task = new fileTask();
             task.execute(new FileOperation("cut",adapter.getSelectedFiles(),new File(selectedDirectory)));
             currentDirectory = new File(selectedDirectory);
             Mode.finish();
         }
-        if (requestCode == 1 && resultCode == 0) { //for copy
+        if (requestCode == copy_request && resultCode == 0) { //for copy
             fileTask task = new fileTask();
             task.execute(new FileOperation("copy",adapter.getSelectedFiles(),new File(selectedDirectory)));
             currentDirectory = new File(selectedDirectory);
@@ -298,10 +311,7 @@ public class MainActivity extends FragmentActivity
         switch (item.getItemId()) {
             case R.id.action_settings:
                 Intent intent = new Intent(MainActivity.this, SettingsMainActivity.class);
-                startActivity(intent);
-                //SettingsFragment settingsFragment = new SettingsFragment();
-                //settingsFragment
-                //settingsFragment.show(getFragmentManager(),"NoticeDialogFragment");
+                startActivityForResult(intent, preference_request);
                 return true;
             case R.id.up:
                 toParentFolder();
@@ -370,14 +380,11 @@ public class MainActivity extends FragmentActivity
     }
 
     public void inflateListView(File[] files){
-
-        List<FileItem> file_list = new ArrayList<FileItem>();
-        for (int i=0; i<files.length; i++){
-            file_list.add(new FileItem(files[i]));
-        }
-        adapter = new FilesArrayAdapter(this,file_list);
+        System.out.println("inflateView");
+        List<File> sortedFiles = AppPreferenceManager.sortByPreference(files, this);
+        currentFiles = sortedFiles.toArray(new File[sortedFiles.size()]);
+        adapter = new FilesArrayAdapter(this, FileItem.fromFileList(sortedFiles));
         listView.setAdapter(adapter);
-
     }
 
     public void openFile(File f) {
@@ -572,4 +579,10 @@ public class MainActivity extends FragmentActivity
         }
     }
 
+    /*
+    @Override
+    protected void onResume() {
+        super.onResume();
+        System.out.println("onResume");
+    }*/
 }

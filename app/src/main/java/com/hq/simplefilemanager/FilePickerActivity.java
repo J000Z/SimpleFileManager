@@ -162,15 +162,10 @@ public class FilePickerActivity extends ActionBarActivity{
     }
 
     public void inflateListView(File[] files){
-
-
-        List<FileItem> file_list = new ArrayList<FileItem>();
-        for (int i=0; i<files.length; i++){
-            file_list.add(new FileItem(files[i]));
-        }
-        adapter = new FilesArrayAdapter(this,file_list);
+        List<File> sortedFiles = AppPreferenceManager.sortByPreference(files, this);
+        currentFiles = sortedFiles.toArray(new File[sortedFiles.size()]);
+        adapter = new FilesArrayAdapter(this, FileItem.fromFileList(sortedFiles));
         listView.setAdapter(adapter);
-
     }
 
 }

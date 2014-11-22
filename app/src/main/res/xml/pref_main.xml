@@ -2,18 +2,16 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="General"
-        android:key="pref_key_general_settings">
+        android:title="General">
         <CheckBoxPreference
-            android:key="pref_key_show_hidden_files"
+            android:key="@string/key_show_hidden"
             android:title="Show hidden files"
             android:defaultValue="true" />
     </PreferenceCategory>
     <PreferenceCategory
-        android:title="Sort"
-        android:key="pref_key_sort_settings">
+        android:title="Sort">
         <ListPreference
-            android:key="pref_key_sort_by"
+            android:key="@string/key_sort_by"
             android:title="Sort by"
             android:defaultValue="0"
             android:entries="@array/pref_sort_by_list_titles"
@@ -21,7 +19,7 @@
             android:negativeButtonText="@null"
             android:positiveButtonText="@null" />
         <ListPreference
-            android:key="pref_key_sort_order"
+            android:key="@string/key_sort_order"
             android:title="Order"
             android:defaultValue="0"
             android:entries="@array/pref_sort_order_list_titles"
@@ -30,8 +28,7 @@
             android:positiveButtonText="@null" />
     </PreferenceCategory>
     <PreferenceCategory
-        android:title="Open with"
-        android:key="pref_key_open_with_settings">
+        android:title="Open with">
         <Preference android:title="Application preference"
                     android:id="@+id/Application_preference">
             <intent android:action="android.intent.action.view"

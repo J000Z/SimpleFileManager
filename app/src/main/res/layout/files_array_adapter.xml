@@ -20,11 +20,12 @@
         android:gravity="center_vertical"
         android:text="New Text"
         android:id="@+id/text"
-        android:textSize="20dp"
+        android:textSize="18dp"
         android:layout_marginLeft="24dp"
         android:layout_weight="1"
         android:singleLine="true"
         android:ellipsize="middle"
+        android:layout_marginRight="24dp"
         />
 
 </LinearLayout>
