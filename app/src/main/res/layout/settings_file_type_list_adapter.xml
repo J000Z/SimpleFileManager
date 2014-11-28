@@ -5,6 +5,7 @@
     android:padding="15dp"
     android:gravity="center_vertical"
     android:descendantFocusability="blocksDescendants"
+    android:background="?android:attr/activatedBackgroundIndicator"
     android:layout_height="wrap_content">
 
     <TextView

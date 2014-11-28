@@ -1,6 +1,7 @@
 package com.hq.simplefilemanager;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.Context;
@@ -14,7 +15,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -34,7 +34,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class MainActivity extends FragmentActivity
+public class MainActivity extends Activity
                         implements NoticeDialogFragment.NoticeDialogListener {
 
 
@@ -538,7 +538,8 @@ public class MainActivity extends FragmentActivity
             } else {
                 Uri uri = Uri.fromFile(f);
                 Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setDataAndType(uri, MimeTypeManager.getMimeType(f));
+                intent.putExtra(Intent.EXTRA_STREAM, uri);
+                intent.setType(MimeTypeManager.getMimeType(f));
                 mShareActionProvider.setShareIntent(intent);
                 shareButton.setVisible(true);
                 return;

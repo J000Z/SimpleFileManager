@@ -1,10 +1,10 @@
 package com.hq.simplefilemanager;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.ActionBarActivity;
 import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class FilePickerActivity extends ActionBarActivity{
+public class FilePickerActivity extends Activity{
 
 
 
@@ -76,13 +76,14 @@ public class FilePickerActivity extends ActionBarActivity{
         actionBar.setTitle("Select a folder");
     }
 
+    /*
     @Override
     public Intent getSupportParentActivityIntent () {
         System.out.println("up button");
         FilePickerActivity.this.setResult(-1);
         FilePickerActivity.this.finish();
         return null;
-    }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -103,6 +104,11 @@ public class FilePickerActivity extends ActionBarActivity{
                 Selection_activity.this.finish();
                 return true;
             */
+            case android.R.id.home:
+                System.out.println("up button");
+                FilePickerActivity.this.setResult(-1);
+                FilePickerActivity.this.finish();
+                return true;
             case R.id.select:
                 Intent intent = getIntent();
                 intent.putExtra("selectedDirectory",currentDirectory.getAbsolutePath());

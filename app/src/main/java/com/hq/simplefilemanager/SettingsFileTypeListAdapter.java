@@ -23,26 +23,57 @@ import java.util.List;
  * Created by jack on 8/31/14.
  */
 public class SettingsFileTypeListAdapter extends ArrayAdapter<String>{
+    boolean[] selectList = null;
     List<String> list = null;
     Context context;
     LayoutInflater inflater;
     PackageManager pk;
     AppPreferenceManager p_manager;
-    int size;
+    int imgSize;
 
     public SettingsFileTypeListAdapter(int layout, Context context, List<String> list, PackageManager pk, AppPreferenceManager p_manager) {
         super(context, layout, list);
         this.context = context;
         this.list = list;
+        this.selectList = new boolean[list.size()];
         inflater = LayoutInflater.from(context);
         this.pk = pk;
-        size = context.getResources().getDimensionPixelSize(R.dimen.gridViewImageWidth);
+        imgSize = context.getResources().getDimensionPixelSize(R.dimen.gridViewImageWidth);
         this.p_manager = p_manager;
     }
 
     private class ViewHolder {
         private TextView text;
         private LinearLayout linearLayout;
+    }
+
+    public void setSelection(int position, boolean checked) {
+        selectList[position] = checked;
+    }
+
+    public boolean isSelected(int position) {
+        return selectList[position];
+    }
+
+    public void unselectAll() {
+        for (int i=0; i<selectList.length; i++)
+            setSelection(i, false);
+    }
+
+    public int selectedCount() {
+        int count = 0;
+        for (int i=0; i<selectList.length; i++)
+            if (isSelected(i))
+                count++;
+        return count;
+    }
+
+    public List<String> getSelected() {
+        List<String> r = new ArrayList<String>();
+        for (int i=0; i<selectList.length; i++)
+            if (isSelected(i))
+                r.add(list.get(i));
+        return r;
     }
 
     @Override
@@ -70,7 +101,7 @@ public class SettingsFileTypeListAdapter extends ArrayAdapter<String>{
         for (Drawable icon : icons) {
             ImageView imageView = new ImageView(context);
             imageView.setImageDrawable(icon);
-            imageView.setLayoutParams(new GridView.LayoutParams(size,size));
+            imageView.setLayoutParams(new GridView.LayoutParams(imgSize,imgSize));
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setPadding(0, 0, 0, 0);
             holder.linearLayout.addView(imageView);

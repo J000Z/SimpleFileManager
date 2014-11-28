@@ -5,9 +5,9 @@
     <item android:id="@+id/select"
         android:icon="@drawable/ic_action_accept"
         android:title="select"
-        app:showAsAction="always"/>
+        android:showAsAction="always"/>
     <item android:id="@+id/up"
         android:icon="@drawable/ic_action_up"
         android:title="upper level"
-        app:showAsAction="always"/>
+        android:showAsAction="always"/>
 </menu>

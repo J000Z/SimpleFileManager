@@ -1,6 +1,7 @@
 package com.hq.simplefilemanager;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.ListActivity;
@@ -11,23 +12,28 @@ import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ShareActionProvider;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SettingsFileTypeListActivity extends ListActivity
+public class SettingsFileTypeListActivity extends Activity
                               implements NoticeDialogFragment.NoticeDialogListener{
 
     AppPreferenceManager p_manager;
     SettingsFileTypeListAdapter mAdapter;
     PackageManager pk;
+    ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +46,61 @@ public class SettingsFileTypeListActivity extends ListActivity
         //actionBar.setDisplayShowTitleEnabled(true);
         pk = getPackageManager();
         p_manager = new AppPreferenceManager(getSharedPreferences("app_preference",MODE_PRIVATE));
+
+
+        listView = (ListView) findViewById(R.id.listView);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String type = mAdapter.getItem(position);
+                System.out.println("Open preference for " + type);
+                pickIntent(type);
+            }
+        });
+
+        listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                mAdapter.setSelection(position, checked);
+                listView.setSelection(position);
+                if (mAdapter.selectedCount() == 0)
+                    mode.finish();
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                MenuInflater inflater = mode.getMenuInflater();
+                inflater.inflate(R.menu.menu_setting_activity_multi_selection, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.delete:
+                        List<String> selected = mAdapter.getSelected();
+                        for (String type : selected)
+                            p_manager.removeType(type);
+                        mode.finish();
+                        refresh();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                mAdapter.unselectAll();
+            }
+        });
+
         refresh();
     }
 
@@ -91,17 +152,7 @@ public class SettingsFileTypeListActivity extends ListActivity
     public void refresh(){
         String[] file_types = p_manager.getTypes();
         mAdapter = new SettingsFileTypeListAdapter(R.layout.settings_file_type_list_activity, getApplicationContext(), Arrays.asList(file_types), pk, p_manager);
-        setListAdapter(mAdapter);
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        String type = mAdapter.getItem(position);
-        System.out.println("Open preference for " + type);
-        pickIntent(type);
-        //Intent intent = new Intent(SettingsFileTypeListActivity.this, SettingsFileTypeSoloActivity.class);
-        //intent.putExtra("file_type", type);
-        //startActivityForResult(intent, OPEN_SETTING_REQUEST);//request_code
+        listView.setAdapter(mAdapter);
     }
 
     private void pickIntent(String type) {
