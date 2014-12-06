@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MyActivity" >
     <item android:id="@+id/add"
+        android:icon="@drawable/ic_action_new"
         android:title="Add preference"
         android:showAsAction="always"/>
 </menu>

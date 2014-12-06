@@ -228,7 +228,7 @@ public class MainActivity extends Activity
                         Mode = mode;
                         DialogFragment dialog3 = new NoticeDialogFragment();
                         Bundle args = new Bundle();
-                        args.putString("input", adapter.getSelectedFiles().get(0).getName());
+                        args.putString("filePath", adapter.getSelectedFiles().get(0).getAbsolutePath());
                         dialog3.setArguments(args);
                         dialog3.show(getFragmentManager(),"edit");
                         return true;

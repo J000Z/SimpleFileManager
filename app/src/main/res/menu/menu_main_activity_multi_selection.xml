@@ -24,6 +24,6 @@
         android:title="Copy"
         android:showAsAction="ifRoom"/>
     <item android:id="@+id/edit"
-        android:title="Edit"
+        android:title="Detail"
         android:showAsAction="never"/>
 </menu>

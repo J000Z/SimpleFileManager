@@ -9,6 +9,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
+
+import java.io.File;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * Created by jack on 9/2/14.
@@ -108,16 +113,23 @@ public class NoticeDialogFragment extends DialogFragment {
                     });
             return builder.create();
         } else if (getTag().equals("edit")) {
-            String filename = bundle.getString("input");
-            //System.out.println(filename);
+            String filePath = bundle.getString("filePath");
+            File f = new File(filePath);
             LayoutInflater inflater = getActivity().getLayoutInflater();
-            builder.setTitle("New file name:");
-            final View view = inflater.inflate(R.layout.notice_dialog_fragment, null);
+            final View view = inflater.inflate(R.layout.notice_dialog_fragment_detail, null);
+
             EditText editText_input = ((EditText) view.findViewById(R.id.input));
-            editText_input.setText(filename);
+            editText_input.setText(f.getName());
+
+            ((TextView) view.findViewById(R.id.TextView1)).setText(readableFileSize(f.length()));
+
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+            ((TextView) view.findViewById(R.id.TextView2)).setText(sdf.format(f.lastModified()));
+
+            builder.setTitle("Detail");
             builder.setView(view)
                     // Add action buttons
-                    .setPositiveButton(R.string.rename, new DialogInterface.OnClickListener() {
+                    .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
                             EditText editText = (EditText) view.findViewById(R.id.input);
@@ -155,5 +167,12 @@ public class NoticeDialogFragment extends DialogFragment {
         }
         // Build the dialog and set up the button click handlers
         return null;
+    }
+
+    public static String readableFileSize(long size) {
+        if(size <= 0) return "0";
+        final String[] units = new String[] { "B", "kB", "MB", "GB", "TB" };
+        int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
+        return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 }

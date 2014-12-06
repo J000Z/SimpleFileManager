@@ -1,6 +1,7 @@
 package com.hq.simplefilemanager;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -159,11 +160,25 @@ public class FilesArrayAdapter extends ArrayAdapter<FileItem>{
             holder = (ViewHolder) view.getTag();
         }
         // Capture position and set to the TextViews
-        holder.text.setText(list.get(position).getName());
+        File f = list.get(position).f;
+        holder.text.setText(f.getName());
         if (list.get(position).f.isDirectory()) {
             holder.icon.setImageResource(R.drawable.file_type_folder);
         } else {
-            holder.icon.setImageResource(R.drawable.file_type_file);
+            /*
+            String fileType = MimeTypeManager.getMimeType(f.getName());
+            if ( fileType.contains("image") &&
+                (fileType.contains("png") || fileType.contains("bmp") || fileType.contains("gif") || fileType.contains("jpeg"))) {
+                Drawable d = Drawable.createFromPath(f.getAbsolutePath());
+                if (d != null) {
+                    holder.icon.setImageDrawable(d);
+                } else {
+                    holder.icon.setImageResource(R.drawable.file_type_file);
+                }
+            } else {
+            */
+                holder.icon.setImageResource(R.drawable.file_type_file);
+            //}
         }
         //holder.checkBox.setChecked(list.get(position).isSelected);
         //holder.checkBox.setTag(list.get(position));
